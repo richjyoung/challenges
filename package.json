@@ -3,12 +3,19 @@
     "version": "1.0.0",
     "main": "index.js",
     "license": "MIT",
+    "scripts": {
+        "start": "forever start --minUptime 1 index.js",
+        "stop": "forever stop index.js",
+        "restart": "forever restart index.js",
+        "logs": "forever logs index.js -f"
+    },
     "prettier": {
         "tabWidth": 4,
         "singleQuote": true
     },
     "dependencies": {
         "chalk": "^2.4.1",
+        "forever": "^0.15.3",
         "moment": "^2.22.2"
     }
 }

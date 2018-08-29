@@ -7,11 +7,13 @@ const flag = require('./flag');
 
 const server = net.createServer(connection_listener);
 const clients = {};
-const interval = 5000;
-const magic_number = 69127;
+const interval = 20000;
+const max_iterations = 20;
 const global_seed = Math.floor(Math.random() * interval + 1);
+
 let draw_time = 0;
-let lottery_draw = [];
+let draw_original = '';
+let draw_sorted = '';
 
 /*****************************************************************************
  *                           Connection Management                           *
@@ -29,6 +31,16 @@ function client_register(id, socket) {
     socket.on('close', function() {
         log(id, 'Disconnected');
         delete clients[id];
+    });
+}
+
+function shutdown(msg) {
+    console.log(chalk.red(msg));
+    for(var id in clients) {
+        clients[id].socket.destroy();
+    }
+    server.close(() => {
+        process.exit(1);
     });
 }
 
@@ -76,6 +88,7 @@ function client_recv_entry(id, data) {
         log(id, `Entry: ${clients[id].entry}`);
         client_send_wait(id);
     } else {
+        log(id, 'Invalid entry');
         client_send_enter_draw(id);
     }
 }
@@ -106,26 +119,34 @@ function setup_draw() {
 
     // Draw unique numbers from the seeded RNG
     let draw = [];
+    let counter = 0;
     while (draw.length < 6) {
         let a = rng_iv % 99 + 1;
         rng_iv = Math.floor(rng_iv / a);
         rng_iv = rng_iv * (99 - a + 1)
+        counter += 1;
+        if (counter > max_iterations) {
+            shutdown('RNG Failure');
+            return;
+        }
         if (draw.indexOf(a) < 0) {
             draw.push(a);
         }
     }
 
+    draw_original = draw.join('-');
+
     // Sort and store ready for comparison
     draw.sort((a, b) => {
         return a - b;
     });
-    lottery_draw = draw.join('-');
+    draw_sorted = draw.join('-');
 
     console.log(
         chalk.yellow(
             `Next: ${moment(draw_time).format(
                 'HH:mm:ss'
-            )}, seed: ${draw_seed}, draw: ${lottery_draw}`
+            )}, seed: ${draw_seed}, draw: ${draw_original}, iterations: ${counter}`
         )
     );
 
@@ -136,9 +157,9 @@ function setup_draw() {
 function run_draw() {
     for (id in clients) {
         if (clients[id].entry) {
-            clients[id].socket.write(`\r\nDraw result: ${lottery_draw}\r\n`);
-            if (clients[id].entry === lottery_draw) {
-                log(id, `WINNER`);
+            clients[id].socket.write(`\r\nDraw result: ${draw_original}\r\n`);
+            if (clients[id].entry === draw_sorted) {
+                log(id, `********** WINNER **********`);
                 clients[id].socket.write('You win!\r\n');
                 clients[id].socket.write(`${flag}\r\n`);
                 clients[id].socket.destroy();
