@@ -5,7 +5,7 @@ const moment = require('moment');
 const flag = require('./flag');
 
 const interval = 5000;
-const max_iterations = 8;
+const max_iterations = 20;
 const clients = {};
 
 const server = net.createServer(connection_listener);
