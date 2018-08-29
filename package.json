@@ -10,6 +10,6 @@
     "dependencies": {
         "chalk": "^2.4.1",
         "moment": "^2.22.2",
-        "random-js": "^1.0.8"
+        "random-seed": "^0.3.0"
     }
 }
