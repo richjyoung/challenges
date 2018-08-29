@@ -1,0 +1,15 @@
+{
+    "name": "hack_the_lottery",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "prettier": {
+        "tabWidth": 4,
+        "singleQuote": true
+    },
+    "dependencies": {
+        "chalk": "^2.4.1",
+        "moment": "^2.22.2",
+        "random-js": "^1.0.8"
+    }
+}
