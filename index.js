@@ -2,16 +2,16 @@ const net = require('net');
 const crypto = require('crypto');
 const chalk = require('chalk');
 const moment = require('moment');
-const rs = require('random-seed');
 
 const flag = require('./flag');
 
 const server = net.createServer(connection_listener);
 const clients = {};
-const interval = 30000;
+const interval = 5000;
+const magic_number = 69127;
 const global_seed = Math.floor(Math.random() * interval + 1);
-let next_time = 0;
-let next_draw = [];
+let draw_time = 0;
+let lottery_draw = [];
 
 /*****************************************************************************
  *                           Connection Management                           *
@@ -85,7 +85,7 @@ function client_send_wait(id) {
         `\r\nCurrent time: ${moment(Date.now()).format('HH:mm:ss')}\r\n`
     );
     clients[id].socket.write(
-        `Next draw:    ${moment(next_time).format('HH:mm:ss')}\r\n`
+        `Next draw:    ${moment(draw_time).format('HH:mm:ss')}\r\n`
     );
 }
 
@@ -95,20 +95,21 @@ function client_send_wait(id) {
 
 function setup_draw() {
     // Setup draw for next interval time (ensuring it is no sooner than half the interval away)
-    next_time = (Math.floor(Date.now() / interval) + 1) * interval;
-    while (next_time - Date.now() < interval / 2) {
-        next_time += interval;
+    draw_time = (Math.floor(Date.now() / interval) + 1) * interval;
+    while (draw_time - Date.now() < interval / 2) {
+        draw_time += interval;
     }
 
     // Add the global seed to the next draw time to get the draw seed
-    const next_seed = next_time + global_seed;
-    const rand = rs.create(9999);
-    // const rand = rs.create(next_seed);
+    let draw_seed = reverse(draw_time + global_seed);
+    let rng_iv = draw_seed;
 
     // Draw unique numbers from the seeded RNG
     let draw = [];
     while (draw.length < 6) {
-        let a = rand.intBetween(1, 99);
+        let a = rng_iv % 99 + 1;
+        rng_iv = Math.floor(rng_iv / a);
+        rng_iv = rng_iv * (99 - a + 1)
         if (draw.indexOf(a) < 0) {
             draw.push(a);
         }
@@ -118,25 +119,25 @@ function setup_draw() {
     draw.sort((a, b) => {
         return a - b;
     });
-    next_draw = draw.join('-');
+    lottery_draw = draw.join('-');
 
     console.log(
         chalk.yellow(
-            `Next: ${moment(next_time).format(
+            `Next: ${moment(draw_time).format(
                 'HH:mm:ss'
-            )}, seed: ${next_seed}, draw: ${next_draw}`
+            )}, seed: ${draw_seed}, draw: ${lottery_draw}`
         )
     );
 
     // Schedule draw execution
-    setTimeout(run_draw, next_time - Date.now());
+    setTimeout(run_draw, draw_time - Date.now());
 }
 
 function run_draw() {
     for (id in clients) {
         if (clients[id].entry) {
-            clients[id].socket.write(`\r\nDraw result: ${next_draw}\r\n`);
-            if (clients[id].entry === next_draw) {
+            clients[id].socket.write(`\r\nDraw result: ${lottery_draw}\r\n`);
+            if (clients[id].entry === lottery_draw) {
                 log(id, `WINNER`);
                 clients[id].socket.write('You win!\r\n');
                 clients[id].socket.write(`${flag}\r\n`);
@@ -162,6 +163,10 @@ function gen_id() {
 
 function log(id, msg) {
     console.log(`${chalk.cyan(id)} ${msg}`);
+}
+
+function reverse(i) {
+    return Number(String(i).split('').reverse().join(''));
 }
 
 server.listen(1337, function() {
