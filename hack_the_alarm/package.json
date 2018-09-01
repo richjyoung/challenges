@@ -1,0 +1,22 @@
+{
+    "name": "hack_the_alarm",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "author": "",
+    "license": "MIT",
+    "scripts": {
+        "start": "forever start --minUptime 1 index.js",
+        "start:dev": "forever start --watch --minUptime 1 index.js",
+        "stop": "forever stop index.js",
+        "restart": "forever restart index.js",
+        "logs": "forever logs index.js -f"
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "singleQuote": true
+    },
+    "dependencies": {
+        "forever": "^0.15.3"
+    }
+}
