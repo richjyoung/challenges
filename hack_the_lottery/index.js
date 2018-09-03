@@ -175,7 +175,7 @@ function reverse(i) {
     );
 }
 
-server.listen(1337, function() {
+server.listen(process.argv[2], function() {
     console.log('H4ck_tH3_L0tT3ry');
     console.log('================');
     console.log(`Draw will be chosen every ${interval}ms`);

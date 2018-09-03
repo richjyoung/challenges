@@ -4,7 +4,7 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
-        "start": "forever start --minUptime 1 index.js",
+        "start": "forever start --minUptime 1 -a -l lottery.log -o stdout.log -e stderr.log index.js 1337",
         "start:dev": "forever start --watch --minUptime 1 index.js",
         "stop": "forever stop index.js",
         "restart": "forever restart index.js",
