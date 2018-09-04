@@ -94,15 +94,27 @@ class AlarmClient {
             this.disconnect();
             return;
         } else if (guess_arr.length === 4) {
+            // Work through the guess, matching the correct values in their correct posision
             for (let i = 3; i >= 0; i--) {
-                let j = remaining_arr.indexOf(guess_arr[i]);
                 if (guess_arr[i] === pin_arr[i]) {
+                    // If correct, increment the counter and remove the value from end of both guess and remaining
+                    // arrays
                     correct += 1;
                     remaining_arr.splice(i, 1);
-                } else if (j >= 0) {
+                    guess_arr.splice(i, 1)
+                } 
+            }
+
+            // Now work through the remaining values that were not correct
+            for (let i = guess_arr.length-1; i >= 0; i--) {
+                // Work out if the guessed value is anywhere in the remaining array
+                let j = remaining_arr.indexOf(guess_arr[i]);
+                if (j >= 0) {
+                    // Remove a match
                     remaining_arr.splice(j, 1);
                 }
             }
+
             let wrong = 4 - correct - remaining_arr.length;
             this.writeln('ACCESS DENIED');
             this.writeln(`Correct digits in right position:   ${correct}`);
