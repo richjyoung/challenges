@@ -5,7 +5,6 @@
     "license": "MIT",
     "scripts": {
         "start": "forever start --minUptime 1 -a -l ish.log -o stdout.log -e stderr.log index.js 1339",
-        "start:dev": "forever start --watch --minUptime 1 -a -l ish.log -o stdout.log -e stderr.log index.js 1339",
         "stop": "forever stop index.js",
         "restart": "forever restart index.js",
         "logs": "forever logs index.js -f"

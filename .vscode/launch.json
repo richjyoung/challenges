@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "hack_the_lottery",
+            "cwd": "${workspaceFolder}/hack_the_lottery",
+            "program": "${workspaceFolder}/hack_the_lottery/index.js",
+            "args": ["1337"]
+        }, {
+            "type": "node",
+            "request": "launch",
+            "name": "hack_the_alarm",
+            "cwd": "${workspaceFolder}/hack_the_alarm",
+            "program": "${workspaceFolder}/hack_the_alarm/index.js",
+            "args": ["1338"]
+        }, {
+            "type": "node",
+            "request": "launch",
+            "name": "ish",
+            "cwd": "${workspaceFolder}/ish",
+            "program": "${workspaceFolder}/ish/index.js",
+            "args": ["1339"]
+        }
+    ]
+}

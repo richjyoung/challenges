@@ -150,4 +150,4 @@ class AlarmClient {
     }
 }
 
-const alarm_server = new AlarmServer(1338);
+const alarm_server = new AlarmServer(process.argv[2]);
